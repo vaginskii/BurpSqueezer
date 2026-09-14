@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<items burpVersion="2026.5">
+  <item><url>https://shop.test/api/users/1</url>
+  <method>GET</method><status>200</status>
+</items>

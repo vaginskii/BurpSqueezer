@@ -1,0 +1,29 @@
+[package]
+name = "BurpSqueezer"
+version = "0.1.0"
+edition = "2026"
+description = "Turns raw Burp Suite XML dumps into a clean, compact, LLM-optimized Markdown report."
+license = "MIT"
+
+[dependencies]
+base64 = "0.22"
+# Colour is deliberately off. This tool has no human-facing UX: it writes one
+# Markdown file and plain progress lines to stderr, so terminal styling would be
+# dead weight. Dropping it also drops the whole anstream stack, and with it the
+# Windows import-library machinery that pulled in `windows-sys`.
+clap = { version = "4", default-features = false, features = [
+    "std",
+    "derive",
+    "help",
+    "usage",
+    "error-context",
+    "suggestions",
+] }
+quick-xml = "0.36"
+serde_json = "1"
+thiserror = "1"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
