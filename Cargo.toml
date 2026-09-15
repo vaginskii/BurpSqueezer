@@ -1,5 +1,5 @@
 [package]
-name = "BurpSqueezer"
+name = "burp_squeezer"
 version = "0.1.0"
 edition = "2021"
 description = "Turns raw Burp Suite XML dumps into a clean, compact, LLM-optimized Markdown report."
