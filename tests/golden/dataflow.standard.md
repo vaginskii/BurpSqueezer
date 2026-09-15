@@ -21,48 +21,48 @@ fp:HHHH = stable short fingerprint of a full value; matching uses the full value
 
 | handle | value | len | entropy | score | seen | coverage | endpoints | propagates | in path | synthetic? | locations |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| fp:04c6 | 3f2504…3301 [fp:04c6] (36 chars) | 36 | 3.62 | 0.84 | 3 | 22.2% | 2 | yes | yes | - | POST /api/orders (resp body.order_ref) [#3], GET /api/orders/{id} (req path) [#4], GET /api/orders/{id} (resp body.order_ref) [#4] |
-| fp:f796 | 9b1deb…cb6d [fp:f796] (36 chars) | 36 | 3.27 | 0.83 | 3 | 22.2% | 2 | yes | yes | - | POST /api/orders (resp body.order_ref) [#6], GET /api/orders/{id} (req path) [#7], GET /api/orders/{id} (resp body.order_ref) [#7] |
-| fp:bfdd | <14 chars> [fp:bfdd] | 14 | 3.81 | 0.77 | 3 | 33.3% | 3 | yes | no | - | GET /api/users/{id} (resp body.user_ref) [#5], POST /api/orders (req body.user_ref) [#6], GET /api/orders/{id} (resp body.user_ref) [#7] |
-| fp:0045 | <14 chars> [fp:0045] | 14 | 3.66 | 0.54 | 5 | 55.6% | 4 | yes | no | - | POST /api/auth/session (resp body.user_ref) [#1], GET /api/users/{id} (resp body.user_ref) [#2], POST /api/orders (req body.user_ref) [#3], GET /api/orders/{id} (resp body.user_ref) [#4], GET /api/users/{id} (resp body.user_ref) [#9] |
-| fp:a3c0 | c9f4a1…0c31 [fp:a3c0] (32 chars) | 32 | 3.89 | 0.54 | 9 | 100.0% | 4 | yes | no | - | POST /api/auth/session (resp body.session_token) [#1], GET /api/users/{id} (req header.authorization) [#2], POST /api/orders (req header.authorization) [#3], GET /api/orders/{id} (req header.authorization) [#4], GET /api/users/{id} (req header.authorization) [#5], POST /api/orders (req header.authorization) [#6], GET /api/orders/{id} (req header.authorization) [#7], GET /api/users/{id} (req header.authorization) [#8], GET /api/users/{id} (req header.authorization) [#9] |
-| fp:8672 | <6 chars> [fp:8672] | 6 | 2.25 | 0.30 | 4 | 44.4% | 2 | no | yes | - | POST /api/orders (req path) [#3], GET /api/orders/{id} (req path) [#4], POST /api/orders (req path) [#6], GET /api/orders/{id} (req path) [#7] |
+| fp:04c6 | 3f2504…3301 [fp:04c6] (36 chars) | 36 | 3.62 | 0.84 | 3 | 22.2% | 2 | yes | yes | - | POST /api/orders (resp body.order_ref), GET /api/orders/{id} (req path), GET /api/orders/{id} (resp body.order_ref) |
+| fp:f796 | 9b1deb…cb6d [fp:f796] (36 chars) | 36 | 3.27 | 0.83 | 3 | 22.2% | 2 | yes | yes | - | POST /api/orders (resp body.order_ref), GET /api/orders/{id} (req path), GET /api/orders/{id} (resp body.order_ref) |
+| fp:bfdd | <14 chars> [fp:bfdd] | 14 | 3.81 | 0.77 | 3 | 33.3% | 3 | yes | no | - | GET /api/users/{id} (resp body.user_ref), POST /api/orders (req body.user_ref), GET /api/orders/{id} (resp body.user_ref) |
+| fp:0045 | <14 chars> [fp:0045] | 14 | 3.66 | 0.54 | 5 | 55.6% | 4 | yes | no | - | POST /api/auth/session (resp body.user_ref), GET /api/users/{id} (resp body.user_ref), POST /api/orders (req body.user_ref), GET /api/orders/{id} (resp body.user_ref) |
+| fp:a3c0 | c9f4a1…0c31 [fp:a3c0] (32 chars) | 32 | 3.89 | 0.54 | 9 | 100.0% | 4 | yes | no | - | POST /api/auth/session (resp body.session_token), GET /api/users/{id} (req header.authorization), POST /api/orders (req header.authorization), GET /api/orders/{id} (req header.authorization) |
+| fp:8672 | <6 chars> [fp:8672] | 6 | 2.25 | 0.30 | 4 | 44.4% | 2 | no | yes | - | POST /api/orders (req path), GET /api/orders/{id} (req path) |
 
 ### Multi-Data-Flow Chains
 
 - **fp:04c6** 3f2504…3301 [fp:04c6] (36 chars) — 3 hops across 2 endpoints, score 1.24
-  1. POST /api/orders (resp body.order_ref) [#3]
-  2. GET /api/orders/{id} (req path) [#4]
-  3. GET /api/orders/{id} (resp body.order_ref) [#4]
+  1. POST /api/orders (resp body.order_ref)
+  2. GET /api/orders/{id} (req path)
+  3. GET /api/orders/{id} (resp body.order_ref)
 - **fp:f796** 9b1deb…cb6d [fp:f796] (36 chars) — 3 hops across 2 endpoints, score 1.23
-  1. POST /api/orders (resp body.order_ref) [#6]
-  2. GET /api/orders/{id} (req path) [#7]
-  3. GET /api/orders/{id} (resp body.order_ref) [#7]
+  1. POST /api/orders (resp body.order_ref)
+  2. GET /api/orders/{id} (req path)
+  3. GET /api/orders/{id} (resp body.order_ref)
 - **fp:bfdd** <14 chars> [fp:bfdd] — 3 hops across 3 endpoints, score 1.19
-  1. GET /api/users/{id} (resp body.user_ref) [#5]
-  2. POST /api/orders (req body.user_ref) [#6]
-  3. GET /api/orders/{id} (resp body.user_ref) [#7]
+  1. GET /api/users/{id} (resp body.user_ref)
+  2. POST /api/orders (req body.user_ref)
+  3. GET /api/orders/{id} (resp body.user_ref)
 - **fp:0045** <14 chars> [fp:0045] — 5 hops across 4 endpoints, score 0.98
-  1. POST /api/auth/session (resp body.user_ref) [#1]
-  2. GET /api/users/{id} (resp body.user_ref) [#2]
-  3. POST /api/orders (req body.user_ref) [#3]
-  4. GET /api/orders/{id} (resp body.user_ref) [#4]
-  5. GET /api/users/{id} (resp body.user_ref) [#9]
+  1. POST /api/auth/session (resp body.user_ref)
+  2. GET /api/users/{id} (resp body.user_ref)
+  3. POST /api/orders (req body.user_ref)
+  4. GET /api/orders/{id} (resp body.user_ref)
+  5. GET /api/users/{id} (resp body.user_ref)
 - **fp:a3c0** c9f4a1…0c31 [fp:a3c0] (32 chars) — 9 hops across 4 endpoints, score 0.98
-  1. POST /api/auth/session (resp body.session_token) [#1]
-  2. GET /api/users/{id} (req header.authorization) [#2]
-  3. POST /api/orders (req header.authorization) [#3]
-  4. GET /api/orders/{id} (req header.authorization) [#4]
-  5. GET /api/users/{id} (req header.authorization) [#5]
-  6. POST /api/orders (req header.authorization) [#6]
-  7. GET /api/orders/{id} (req header.authorization) [#7]
-  8. GET /api/users/{id} (req header.authorization) [#8]
-  9. GET /api/users/{id} (req header.authorization) [#9]
+  1. POST /api/auth/session (resp body.session_token)
+  2. GET /api/users/{id} (req header.authorization)
+  3. POST /api/orders (req header.authorization)
+  4. GET /api/orders/{id} (req header.authorization)
+  5. GET /api/users/{id} (req header.authorization)
+  6. POST /api/orders (req header.authorization)
+  7. GET /api/orders/{id} (req header.authorization)
+  8. GET /api/users/{id} (req header.authorization)
+  9. GET /api/users/{id} (req header.authorization)
 - **fp:8672** <6 chars> [fp:8672] — 4 hops across 2 endpoints, score 0.35
-  1. POST /api/orders (req path) [#3]
-  2. GET /api/orders/{id} (req path) [#4]
-  3. POST /api/orders (req path) [#6]
-  4. GET /api/orders/{id} (req path) [#7]
+  1. POST /api/orders (req path)
+  2. GET /api/orders/{id} (req path)
+  3. POST /api/orders (req path)
+  4. GET /api/orders/{id} (req path)
 
 ### High-Relevance Endpoints
 
