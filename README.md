@@ -51,8 +51,6 @@ BurpSqueezer is designed as a universal tool with no hardcoded endpoints or appl
 
 A key goal is **information-dense compression**: reducing large HTTP request dumps into much smaller representations while retaining useful structural, relational, and data-flow information.
 
-This makes the resulting reports practical as LLM context even when the original Burp dataset would be too large, expensive, or otherwise impractical to provide directly to an AI model.
-
 BurpSqueezer is designed primarily for **APIs and applications with meaningful business logic**. Simple websites with little or no backend logic may produce significantly less useful results because there may be insufficient structure and relationships for the tool to analyze.
 
 ## Features
@@ -96,8 +94,11 @@ burpsqueezer solve input.xml --output report.md --mode standard
 # Basic usage
 burpsqueezer solve burp_dump.xml --output analysis.md
 
-# Maximum // Lowest selectivity
-burpsqueezer solve large_dump.xml --output focused.md --mode apocalyptic // --mode peaceful
+# Maximum selectivity
+burpsqueezer solve large_dump.xml --output focused.md --mode apocalyptic
+
+# Lowest selectivity
+burpsqueezer solve large_dump.xml --output full.md --mode peaceful
 
 # Verbose output for debugging
 burpsqueezer solve test.xml --output report.md --verbose
