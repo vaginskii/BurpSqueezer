@@ -29,6 +29,22 @@ The resulting report can be substantially smaller than the original dump, making
 
 BurpSqueezer is **not an autonomous pentester**. It prepares and compresses application traffic into a representation that can be further analyzed by humans or LLMs. Final security conclusions and verification still require manual testing.
 
+## Real-World Compression
+
+A test on a real Burp Suite XML dump demonstrated substantial size reduction:
+
+| Mode          | Compression |
+| ------------- | ----------: |
+| `peaceful`    |    **347×** |
+| `standard`    |    **745×** |
+| `apocalyptic` |   **1738×** |
+
+In the `standard` test, an approximately **26.7 MB** Burp Suite XML dump containing **323 transactions** was reduced to approximately **35 KB** of structured Markdown.
+
+The original traffic is not included in this repository because real Burp captures may contain sensitive application data, credentials, tokens, or other private information.
+
+Compression results naturally vary depending on the structure and contents of the input dataset.
+
 ## Philosophy
 
 BurpSqueezer is designed as a universal tool with no hardcoded endpoints or application-specific patterns. Instead of assuming how an API is structured, it uses statistical and heuristic analysis to identify potentially meaningful relationships within the observed traffic.
@@ -48,22 +64,6 @@ BurpSqueezer is designed primarily for **APIs and applications with meaningful b
 * **Structural Analysis** — Extracts relationships, sequences, states, and other signals from observed traffic
 * **LLM-Optimized Output** — Produces compact Markdown designed to be used as context for LLM-based analysis
 * **Multiple Modes** — Adjustable selectivity depending on whether completeness or maximum compression is preferred
-
-## Real-World Compression
-
-A test on a real Burp Suite XML dump demonstrated substantial size reduction:
-
-| Mode          | Compression |
-| ------------- | ----------: |
-| `peaceful`    |    **347×** |
-| `standard`    |    **745×** |
-| `apocalyptic` |   **1738×** |
-
-In the `standard` test, an approximately **26.7 MB** Burp Suite XML dump containing **323 transactions** was reduced to approximately **35 KB** of structured Markdown.
-
-The original traffic is not included in this repository because real Burp captures may contain sensitive application data, credentials, tokens, or other private information.
-
-Compression results naturally vary depending on the structure and contents of the input dataset.
 
 ## Installation
 
@@ -105,7 +105,7 @@ burpsqueezer solve test.xml --output report.md --verbose
 
 ## Output
 
-BurpSqueezer transforms raw Burp Suite XML traffic into a structured and highly compact Markdown representation intended for both human review and LLM-based analysis.
+BurpSqueezer transforms raw Burp Suite XML traffic into a structured and highly compact Markdown representation intended for LLM-based analysis.
 
 The generated report can contain information about:
 
