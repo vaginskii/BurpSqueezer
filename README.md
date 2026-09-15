@@ -65,9 +65,26 @@ BurpSqueezer is designed primarily for **APIs and applications with meaningful b
 
 ## Installation
 
+BurpSqueezer is written in Rust. Make sure you have the **Rust toolchain** installed before continuing.
+
+If Rust is not installed, install it from the official Rust website.
+
+Then clone the repository and install BurpSqueezer:
+
 ```bash
+git clone https://github.com/vaginskii/BurpSqueezer.git
+cd BurpSqueezer
 cargo install --path .
 ```
+
+After installation, verify that BurpSqueezer is available:
+
+```bash
+burpsqueezer --help
+```
+
+If the command displays the available options, the installation was successful.
+
 
 ## Usage
 
