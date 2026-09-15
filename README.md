@@ -89,7 +89,17 @@ If the command displays the available options, the installation was successful.
 ## Usage
 
 ```bash
-burpsqueezer solve input.xml --output report.md --mode standard
+# Basic usage
+burpsqueezer solve burp_dump.xml --output analysis.md
+
+# Maximum selectivity
+burpsqueezer solve large_dump.xml --output focused.md --mode apocalyptic
+
+# Lowest selectivity
+burpsqueezer solve large_dump.xml --output full.md --mode peaceful
+
+# Verbose output for debugging
+burpsqueezer solve test.xml --output report.md --verbose
 ```
 
 ### Modes
@@ -104,22 +114,7 @@ burpsqueezer solve input.xml --output report.md --mode standard
 * `--mode` — analysis mode (default: `standard`)
 * `--quiet` — silence all progress output
 * `--verbose` — emit per-stage detail
-
-## Examples
-
-```bash
-# Basic usage
-burpsqueezer solve burp_dump.xml --output analysis.md
-
-# Maximum selectivity
-burpsqueezer solve large_dump.xml --output focused.md --mode apocalyptic
-
-# Lowest selectivity
-burpsqueezer solve large_dump.xml --output full.md --mode peaceful
-
-# Verbose output for debugging
-burpsqueezer solve test.xml --output report.md --verbose
-```
+  
 
 ## Output
 
