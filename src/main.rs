@@ -5,8 +5,8 @@ use std::process::ExitCode;
 
 use clap::Parser;
 
-use burp_squeezer::cli::Cli;
-use burp_squeezer::error::EXIT_OK;
+use burpsqueezer::cli::Cli;
+use burpsqueezer::error::EXIT_OK;
 
 fn main() -> ExitCode {
     match Cli::parse().execute() {
@@ -22,7 +22,7 @@ fn main() -> ExitCode {
 ///
 /// Errors are the one thing an operator must always see: suppressing them would
 /// leave a non-zero exit code with no explanation.
-fn report(error: &burp_squeezer::Error) {
+fn report(error: &burpsqueezer::Error) {
     eprintln!("error: {error}");
     let mut cause = error.source();
     while let Some(current) = cause {
