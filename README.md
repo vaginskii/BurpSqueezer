@@ -16,7 +16,7 @@ Large Burp Suite XML dump
 Compact structured Markdown
           │
           ▼
-    Human / LLM analysis
+     LLM analysis
 ```
 
 ## Why BurpSqueezer?
