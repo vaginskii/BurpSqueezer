@@ -21,50 +21,50 @@ fp:HHHH = stable short fingerprint of a full value; matching uses the full value
 
 | handle | value | len | entropy | score | seen | coverage | endpoints | propagates | in path | synthetic? | locations |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| fp:4c79 | 9a3ca0…a676 [fp:4c79] (36 chars) | 36 | 3.67 | 0.82 | 4 | 17.6% | 2 | yes | no | - | GET /assets/palette.json (resp body.palette[]) [#2], GET /assets/palette.json (resp body.palette[]) [#3], PUT /api/accounts/{id}/palette (req body.palette) [#7], PUT /api/accounts/{id}/palette (resp body.palette) [#7] |
-| fp:2fef | 314316…8b61 [fp:2fef] (36 chars) | 36 | 3.65 | 0.82 | 4 | 17.6% | 2 | yes | no | - | GET /assets/tiers.json (resp body.tiers[]) [#4], GET /assets/tiers.json (resp body.tiers[]) [#5], PUT /api/accounts/{id}/tier (req body.tier) [#8], PUT /api/accounts/{id}/tier (resp body.tier) [#8] |
-| fp:baa6 | acct_9…t7Kd [fp:baa6] (17 chars) | 17 | 3.85 | 0.80 | 7 | 23.5% | 4 | yes | yes | - | POST /api/session (resp body.account) [#1], GET /api/accounts/{id} (req path) [#6], GET /api/accounts/{id} (resp body.account) [#6], PUT /api/accounts/{id}/palette (req path) [#7], PUT /api/accounts/{id}/palette (resp body.account) [#7], PUT /api/accounts/{id}/tier (req path) [#8], PUT /api/accounts/{id}/tier (resp body.account) [#8] |
-| fp:b283 | 4d8c17…0d64 [fp:b283] (40 chars) | 40 | 3.97 | 0.67 | 13 | 76.5% | 8 | yes | no | - | POST /api/session (resp body.token) [#1], GET /api/accounts/{id} (req header.authorization) [#6], PUT /api/accounts/{id}/palette (req header.authorization) [#7], PUT /api/accounts/{id}/tier (req header.authorization) [#8], GET /api/rooms/{id}/updates (req header.authorization) [#9], GET /api/rooms/{id}/updates (req header.authorization) [#10], GET /api/rooms/{id}/updates (req header.authorization) [#11], POST /api/rooms/{id}/messages (req header.authorization) [#21], POST /api/rooms/{id}/messages (req header.authorization) [#22], POST /api/rooms/{id}/messages (req header.authorization) [#23], POST /api/rooms/{id}/messages (req header.authorization) [#24], GET /api/rooms/{id}/members (req header.authorization) [#25], DELETE /api/rooms/{id}/members/{id} (req header.authorization) [#26] |
-| fp:5926 | 990f1d…a4ab [fp:5926] (36 chars) | 36 | 3.87 | 0.59 | 2 | 11.8% | 1 | no | no | - | GET /assets/tiers.json (resp body.tiers[]) [#4], GET /assets/tiers.json (resp body.tiers[]) [#5] |
-| fp:6dbf | 7ce31b…195a [fp:6dbf] (36 chars) | 36 | 3.79 | 0.59 | 2 | 11.8% | 1 | no | no | - | GET /assets/tiers.json (resp body.tiers[]) [#4], GET /assets/tiers.json (resp body.tiers[]) [#5] |
-| fp:d88e | ffc3b3…3209 [fp:d88e] (36 chars) | 36 | 3.77 | 0.59 | 2 | 11.8% | 1 | no | no | - | GET /assets/tiers.json (resp body.tiers[]) [#4], GET /assets/tiers.json (resp body.tiers[]) [#5] |
-| fp:f7b1 | e7020c…ff60 [fp:f7b1] (36 chars) | 36 | 3.73 | 0.59 | 2 | 11.8% | 1 | no | no | - | GET /assets/tiers.json (resp body.tiers[]) [#4], GET /assets/tiers.json (resp body.tiers[]) [#5] |
-| fp:1231 | 9601c5…11d5 [fp:1231] (36 chars) | 36 | 3.50 | 0.58 | 2 | 11.8% | 1 | no | no | - | GET /assets/tiers.json (resp body.tiers[]) [#4], GET /assets/tiers.json (resp body.tiers[]) [#5] |
+| fp:4c79 | 9a3ca0…a676 [fp:4c79] (36 chars) | 36 | 3.67 | 0.82 | 4 | 17.6% | 2 | yes | no | - | GET /assets/palette.json (resp body.palette[]), PUT /api/accounts/{id}/palette (req body.palette), PUT /api/accounts/{id}/palette (resp body.palette) |
+| fp:2fef | 314316…8b61 [fp:2fef] (36 chars) | 36 | 3.65 | 0.82 | 4 | 17.6% | 2 | yes | no | - | GET /assets/tiers.json (resp body.tiers[]), PUT /api/accounts/{id}/tier (req body.tier), PUT /api/accounts/{id}/tier (resp body.tier) |
+| fp:baa6 | acct_9…t7Kd [fp:baa6] (17 chars) | 17 | 3.85 | 0.80 | 7 | 23.5% | 4 | yes | yes | - | POST /api/session (resp body.account), GET /api/accounts/{id} (req path), GET /api/accounts/{id} (resp body.account), PUT /api/accounts/{id}/palette (req path), PUT /api/accounts/{id}/palette (resp body.account), PUT /api/accounts/{id}/tier (req path), PUT /api/accounts/{id}/tier (resp body.account) |
+| fp:b283 | 4d8c17…0d64 [fp:b283] (40 chars) | 40 | 3.97 | 0.67 | 13 | 76.5% | 8 | yes | no | - | POST /api/session (resp body.token), GET /api/accounts/{id} (req header.authorization), PUT /api/accounts/{id}/palette (req header.authorization), PUT /api/accounts/{id}/tier (req header.authorization), GET /api/rooms/{id}/updates (req header.authorization), POST /api/rooms/{id}/messages (req header.authorization), GET /api/rooms/{id}/members (req header.authorization), DELETE /api/rooms/{id}/members/{id} (req header.authorization) |
+| fp:5926 | 990f1d…a4ab [fp:5926] (36 chars) | 36 | 3.87 | 0.59 | 2 | 11.8% | 1 | no | no | - | GET /assets/tiers.json (resp body.tiers[]) |
+| fp:6dbf | 7ce31b…195a [fp:6dbf] (36 chars) | 36 | 3.79 | 0.59 | 2 | 11.8% | 1 | no | no | - | GET /assets/tiers.json (resp body.tiers[]) |
+| fp:d88e | ffc3b3…3209 [fp:d88e] (36 chars) | 36 | 3.77 | 0.59 | 2 | 11.8% | 1 | no | no | - | GET /assets/tiers.json (resp body.tiers[]) |
+| fp:f7b1 | e7020c…ff60 [fp:f7b1] (36 chars) | 36 | 3.73 | 0.59 | 2 | 11.8% | 1 | no | no | - | GET /assets/tiers.json (resp body.tiers[]) |
+| fp:1231 | 9601c5…11d5 [fp:1231] (36 chars) | 36 | 3.50 | 0.58 | 2 | 11.8% | 1 | no | no | - | GET /assets/tiers.json (resp body.tiers[]) |
 
 ### Multi-Data-Flow Chains
 
 - **fp:baa6** acct_9…t7Kd [fp:baa6] (17 chars) — 7 hops across 4 endpoints, score 1.24
-  1. POST /api/session (resp body.account) [#1]
-  2. GET /api/accounts/{id} (req path) [#6]
-  3. GET /api/accounts/{id} (resp body.account) [#6]
-  4. PUT /api/accounts/{id}/palette (req path) [#7]
-  5. PUT /api/accounts/{id}/palette (resp body.account) [#7]
-  6. PUT /api/accounts/{id}/tier (req path) [#8]
-  7. PUT /api/accounts/{id}/tier (resp body.account) [#8]
+  1. POST /api/session (resp body.account)
+  2. GET /api/accounts/{id} (req path)
+  3. GET /api/accounts/{id} (resp body.account)
+  4. PUT /api/accounts/{id}/palette (req path)
+  5. PUT /api/accounts/{id}/palette (resp body.account)
+  6. PUT /api/accounts/{id}/tier (req path)
+  7. PUT /api/accounts/{id}/tier (resp body.account)
 - **fp:4c79** 9a3ca0…a676 [fp:4c79] (36 chars) — 4 hops across 2 endpoints, score 1.22
-  1. GET /assets/palette.json (resp body.palette[]) [#2]
-  2. GET /assets/palette.json (resp body.palette[]) [#3]
-  3. PUT /api/accounts/{id}/palette (req body.palette) [#7]
-  4. PUT /api/accounts/{id}/palette (resp body.palette) [#7]
+  1. GET /assets/palette.json (resp body.palette[])
+  2. GET /assets/palette.json (resp body.palette[])
+  3. PUT /api/accounts/{id}/palette (req body.palette)
+  4. PUT /api/accounts/{id}/palette (resp body.palette)
 - **fp:2fef** 314316…8b61 [fp:2fef] (36 chars) — 4 hops across 2 endpoints, score 1.22
-  1. GET /assets/tiers.json (resp body.tiers[]) [#4]
-  2. GET /assets/tiers.json (resp body.tiers[]) [#5]
-  3. PUT /api/accounts/{id}/tier (req body.tier) [#8]
-  4. PUT /api/accounts/{id}/tier (resp body.tier) [#8]
+  1. GET /assets/tiers.json (resp body.tiers[])
+  2. GET /assets/tiers.json (resp body.tiers[])
+  3. PUT /api/accounts/{id}/tier (req body.tier)
+  4. PUT /api/accounts/{id}/tier (resp body.tier)
 - **fp:b283** 4d8c17…0d64 [fp:b283] (40 chars) — 13 hops across 8 endpoints, score 1.13
-  1. POST /api/session (resp body.token) [#1]
-  2. GET /api/accounts/{id} (req header.authorization) [#6]
-  3. PUT /api/accounts/{id}/palette (req header.authorization) [#7]
-  4. PUT /api/accounts/{id}/tier (req header.authorization) [#8]
-  5. GET /api/rooms/{id}/updates (req header.authorization) [#9]
-  6. GET /api/rooms/{id}/updates (req header.authorization) [#10]
-  7. GET /api/rooms/{id}/updates (req header.authorization) [#11]
-  8. POST /api/rooms/{id}/messages (req header.authorization) [#21]
-  9. POST /api/rooms/{id}/messages (req header.authorization) [#22]
-  10. POST /api/rooms/{id}/messages (req header.authorization) [#23]
-  11. POST /api/rooms/{id}/messages (req header.authorization) [#24]
-  12. GET /api/rooms/{id}/members (req header.authorization) [#25]
-  13. DELETE /api/rooms/{id}/members/{id} (req header.authorization) [#26]
+  1. POST /api/session (resp body.token)
+  2. GET /api/accounts/{id} (req header.authorization)
+  3. PUT /api/accounts/{id}/palette (req header.authorization)
+  4. PUT /api/accounts/{id}/tier (req header.authorization)
+  5. GET /api/rooms/{id}/updates (req header.authorization)
+  6. GET /api/rooms/{id}/updates (req header.authorization)
+  7. GET /api/rooms/{id}/updates (req header.authorization)
+  8. POST /api/rooms/{id}/messages (req header.authorization)
+  9. POST /api/rooms/{id}/messages (req header.authorization)
+  10. POST /api/rooms/{id}/messages (req header.authorization)
+  11. POST /api/rooms/{id}/messages (req header.authorization)
+  12. GET /api/rooms/{id}/members (req header.authorization)
+  13. DELETE /api/rooms/{id}/members/{id} (req header.authorization)
 
 ### High-Relevance Endpoints
 
