@@ -21,17 +21,17 @@ fp:HHHH = stable short fingerprint of a full value; matching uses the full value
 
 | handle | value | len | entropy | score | seen | coverage | endpoints | propagates | in path | synthetic? | locations |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| fp:a3c0 | c9f4a1…0c31 [fp:a3c0] (32 chars) | 32 | 3.89 | 0.52 | 2 | 100.0% | 2 | yes | no | - | POST /api/auth/session (resp body.session_token) [#1], GET /api/users/{id} (req header.authorization) [#2] |
-| fp:0045 | <14 chars> [fp:0045] | 14 | 3.66 | 0.38 | 2 | 100.0% | 2 | no | no | - | POST /api/auth/session (resp body.user_ref) [#1], GET /api/users/{id} (resp body.user_ref) [#2] |
+| fp:a3c0 | c9f4a1…0c31 [fp:a3c0] (32 chars) | 32 | 3.89 | 0.52 | 2 | 100.0% | 2 | yes | no | - | POST /api/auth/session (resp body.session_token), GET /api/users/{id} (req header.authorization) |
+| fp:0045 | <14 chars> [fp:0045] | 14 | 3.66 | 0.38 | 2 | 100.0% | 2 | no | no | - | POST /api/auth/session (resp body.user_ref), GET /api/users/{id} (resp body.user_ref) |
 
 ### Multi-Data-Flow Chains
 
 - **fp:a3c0** c9f4a1…0c31 [fp:a3c0] (32 chars) — 2 hops across 2 endpoints, score 0.92
-  1. POST /api/auth/session (resp body.session_token) [#1]
-  2. GET /api/users/{id} (req header.authorization) [#2]
+  1. POST /api/auth/session (resp body.session_token)
+  2. GET /api/users/{id} (req header.authorization)
 - **fp:0045** <14 chars> [fp:0045] — 2 hops across 2 endpoints, score 0.43
-  1. POST /api/auth/session (resp body.user_ref) [#1]
-  2. GET /api/users/{id} (resp body.user_ref) [#2]
+  1. POST /api/auth/session (resp body.user_ref)
+  2. GET /api/users/{id} (resp body.user_ref)
 
 ### High-Relevance Endpoints
 
