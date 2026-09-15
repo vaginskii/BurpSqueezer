@@ -1,6 +1,6 @@
 # BurpSqueezer
 
-**Turn large Burp Suite XML dumps into compact Markdown reports for LLM analysis.**
+**Turn Burp Suite XML dumps into compact, LLM-ready Markdown reports.**
 
 BurpSqueezer is a security research tool that transforms large Burp Suite HTTP traffic dumps into highly compact, structured Markdown representations designed to be consumed by LLMs.
 
