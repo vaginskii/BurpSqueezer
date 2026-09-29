@@ -164,6 +164,53 @@ burpsqueezer solve test.xml --output report.md --verbose
 * `--quiet` — silence all progress output
 * `--verbose` — emit per-stage detail on stderr; conflicts with `--quiet`
 
+## Console Output
+
+
+`solve` prints each stage as it runs, so it is visible what was parsed, what was discarded, and what actually ended up in the report.
+
+```console
+$ burpsqueezer solve burp_dump.xml --output analysis.md
+burpsqueezer 0.2.0 starting on burp_dump.xml (mode standard, secrets true)
+[1/8] parsing Burp XML
+      552 transactions parsed
+[2/8] filtering noise
+      81 kept, 471 dropped
+[3/8] normalizing paths
+      60 templated endpoints
+[4/8] mining strong values
+      18087 candidate values observed, 47 strong values mined
+[5/8] building relationships
+      24 chains, 72 sequences built
+[6/8] detecting field variation
+      8 possible state indicators
+[7/8] prioritizing
+      report keeps 40 strong values, 21 chains, 21 high-relevance endpoints, 15 sequences
+      limited: Strong Values: showing 40 of 47 (limited by --mode standard)
+      limited: sequences: showing 15 of 43 (limited by --mode standard)
+[8/8] rendering Markdown
+      wrote analysis.md (52585 bytes)
+```
+
+
+The stages are:
+
+* **[1/8] parsing** — the XML is read; a malformed or wrong file fails here
+* **[2/8] filtering noise** — low-value traffic is dropped statistically. Discarding 471 of 552 transactions is normal on a noisy capture and is not a failure
+* **[3/8] normalizing paths** — parameterized endpoints are collapsed into a single templated endpoint
+* **[4/8] mining strong values** — every candidate value is observed, and those scoring above the thresholds are kept. The gap between the two numbers is what selectivity means
+* **[5/8] building relationships** — values are linked into request chains and ordered sequences
+* **[6/8] detecting field variation** — fields whose values vary across requests are collected as possible state indicators
+* **[7/8] prioritizing** — the report is capped to what the mode allows, and what it keeps is stated
+* **[8/8] rendering** — the Markdown file is written, with its final size
+
+
+Lines beginning with `limited:` are the ones to read when auditing a result. They mean the item was found and then withheld to fit the mode's cap: `showing 40 of 47` means 7 strong values are not in the report. Re-run with a lower-selectivity mode — `standard` → `peaceful` — to see them. This is reported rather than applied silently, so a smaller report is never mistaken for a complete one.
+
+
+`--quiet` suppresses all progress output; `--verbose` adds per-stage detail on stderr.
+
+
 
 ## Value Masking
 
