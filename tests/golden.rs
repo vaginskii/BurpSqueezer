@@ -108,7 +108,7 @@ fn reports_match_their_snapshots() {
 }
 
 fn render_fixture(name: &str, mode: Mode) -> String {
-    let model = burpsqueezer::squeeze(&fixture(name), mode)
+    let model = burpsqueezer::squeeze(&fixture(name), mode, true)
         .unwrap_or_else(|error| panic!("{name} must analyse in {mode:?}: {error}"));
     render::render(&model)
 }

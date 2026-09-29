@@ -19,7 +19,7 @@ use burpsqueezer::config::Mode;
 use burpsqueezer::model::report::ReportModel;
 use common::fixture;
 
-const MODES: [Mode; 3] = [Mode::Peaceful, Mode::Standard, Mode::Apocalyptic];
+const MODES: [Mode; 3] = [Mode::Safe, Mode::Standard, Mode::Apocalyptic];
 
 /// Constants repeated by the capture's transport envelope.
 ///
@@ -56,7 +56,7 @@ const BUSINESS_VALUES: [&str; 6] = [
 ];
 
 fn squeeze(mode: Mode) -> ReportModel {
-    burpsqueezer::squeeze(&fixture("header_noise.xml"), mode).expect("fixture must analyse")
+    burpsqueezer::squeeze(&fixture("header_noise.xml"), mode, true).expect("fixture must analyse")
 }
 
 /// Values are reported by handle, so that is what identifies them.
@@ -219,11 +219,11 @@ fn long_trails_show_all_hops() {
 /// Stricter modes must cut noise before signal.
 #[test]
 fn stricter_modes_keep_the_identifiers_and_shed_the_rest() {
-    let peaceful = squeeze(Mode::Peaceful);
+    let safe = squeeze(Mode::Safe);
     let standard = squeeze(Mode::Standard);
     let apocalyptic = squeeze(Mode::Apocalyptic);
 
-    assert!(peaceful.strong_values.len() >= standard.strong_values.len());
+    assert!(safe.strong_values.len() >= standard.strong_values.len());
     assert!(standard.strong_values.len() >= apocalyptic.strong_values.len());
 
     // Whatever else is dropped on the way, the identifiers are still there.

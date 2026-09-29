@@ -21,15 +21,15 @@ fp:HHHH = stable short fingerprint of a full value; matching uses the full value
 
 | handle | value | len | entropy | score | seen | coverage | endpoints | propagates | in path | synthetic? | locations |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| fp:a3c0 | c9f4a1…0c31 [fp:a3c0] (32 chars) | 32 | 3.89 | 0.52 | 2 | 100.0% | 2 | yes | no | - | POST /api/auth/session (resp body.session_token), GET /api/users/{id} (req header.authorization) |
-| fp:0045 | <14 chars> [fp:0045] | 14 | 3.66 | 0.38 | 2 | 100.0% | 2 | no | no | - | POST /api/auth/session (resp body.user_ref), GET /api/users/{id} (resp body.user_ref) |
+| fp:a3c0 | c9f4a1…0c31 [fp:a3c0] (32 chars) | 32 | 3.89 | 0.68 | 2 | 100.0% | 2 | yes | no | - | POST /api/auth/session (resp body.session_token), GET /api/users/{id} (req header.authorization) |
+| fp:0045 | <14 chars> [fp:0045] | 14 | 3.66 | 0.50 | 2 | 100.0% | 2 | no | no | - | POST /api/auth/session (resp body.user_ref), GET /api/users/{id} (resp body.user_ref) |
 
 ### Multi-Data-Flow Chains
 
-- **fp:a3c0** c9f4a1…0c31 [fp:a3c0] (32 chars) — 2 hops across 2 endpoints, score 0.92
+- **fp:a3c0** c9f4a1…0c31 [fp:a3c0] (32 chars) — 2 hops across 2 endpoints, score 1.08
   1. POST /api/auth/session (resp body.session_token)
   2. GET /api/users/{id} (req header.authorization)
-- **fp:0045** <14 chars> [fp:0045] — 2 hops across 2 endpoints, score 0.43
+- **fp:0045** <14 chars> [fp:0045] — 2 hops across 2 endpoints, score 0.55
   1. POST /api/auth/session (resp body.user_ref)
   2. GET /api/users/{id} (resp body.user_ref)
 
@@ -37,8 +37,8 @@ fp:HHHH = stable short fingerprint of a full value; matching uses the full value
 
 | endpoint | hits | statuses | relevance | why | query | req fields | resp fields | values |
 |---|---|---|---|---|---|---|---|---|
-| POST /api/auth/session | 1 | 200 | 0.18 | auth | - | login | session_token, state, user_ref | fp:0045, fp:a3c0 |
-| GET /api/users/{id} | 1 | 200 | 0.07 | object_read | - | - | state, tier, user_ref | fp:0045, fp:a3c0 |
+| POST /api/auth/session | 1 | 200 | 0.12 | auth | - | login | session_token, state, user_ref | fp:0045, fp:a3c0 |
+| GET /api/users/{id} | 1 | 200 | 0.05 | object_read | - | - | state, tier, user_ref | fp:0045, fp:a3c0 |
 
 ## Secondary Context
 

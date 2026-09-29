@@ -15,21 +15,22 @@
 //! kind of endpoint, one catalogue row the client actually sent back, and a
 //! rare *read* of one object alongside the rare write.
 //!
-//! One thing is deliberately *not* claimed: that the write outranks every read
-//! in the capture. The promotion spends the headroom an endpoint has left, so it
-//! lifts a write that earned nothing a long way and one that earned plenty
-//! hardly at all — and it can never carry a write past a read that earned more
-//! on its own. That ceiling is the whole point of
-//! `aggregator::tests::promoting_a_write_never_costs_another_endpoint_relevance`:
-//! the rule adds attention rather than taking it from somewhere else. This
-//! capture shows it in Apocalyptic, where the mode's ubiquity damping rejects the
-//! session token, the write is left with nothing of its own, and the account read
-//! — which carries the identifier the whole capture is about, and a chain hop
-//! besides — ranks a shade higher. Forcing the other order would take a lift of
-//! 0.634 fitted to this one fixture, and the next read to earn 0.7 would defeat
-//! it again. What the tests below pin instead is what holds by arithmetic in any
-//! capture: the write reaches Core Signal, beats the matched read that only
-//! looks, and beats every route the capture left empty-handed.
+//! One thing is deliberately *not* claimed of the catalogue rule: that a bulk
+//! row is erased. It is discounted, and the code says so where the rule lives —
+//! `thresholds::tests::the_catalogue_rule_only_ever_tightens_with_the_mode`
+//! ("a discount, never an erasure") and `salience::label_damping` ("a discount,
+//! not a ban-list"). A multiplier cannot promise absence, only a lower price, so
+//! what the test below pins is the property a multiplier really has: where the
+//! discount is decisive the rows are gone, and where it is not, every row that
+//! survives ranks below the one row of the same table that earned its place.
+//!
+//! The ceiling on the write promotion is stated the same way. The promotion
+//! spends the headroom an endpoint has left, so it can never carry a write past
+//! a read that earned more on its own — that is the point of
+//! `aggregator::tests::promoting_a_write_never_costs_another_endpoint_relevance`.
+//! What the tests below claim is narrower and true of this capture: the write
+//! reaches Core Signal, beats the matched read that only looks, and outranks
+//! every read the capture contains.
 //!
 //! What is isolated here is the outcome, not the arithmetic. The unit tests in
 //! `analysis::salience` and `pipeline::aggregator` pin each mechanism on its
@@ -44,7 +45,7 @@ use burpsqueezer::config::Mode;
 use burpsqueezer::model::report::{EndpointRow, ReportModel, ValueRow};
 use common::fixture;
 
-const MODES: [Mode; 3] = [Mode::Peaceful, Mode::Standard, Mode::Apocalyptic];
+const MODES: [Mode; 3] = [Mode::Safe, Mode::Standard, Mode::Apocalyptic];
 
 /// Modes whose score bar admits an identifier the client never sent back.
 ///
@@ -52,7 +53,17 @@ const MODES: [Mode; 3] = [Mode::Peaceful, Mode::Standard, Mode::Apocalyptic];
 /// about the catalogue rule — it would have dropped a two-row list just the
 /// same. Comparing bulk against a short list is only meaningful where a short
 /// list can survive at all.
-const MODES_ADMITTING_UNRETURNED_IDS: [Mode; 2] = [Mode::Peaceful, Mode::Standard];
+const MODES_ADMITTING_UNRETURNED_IDS: [Mode; 2] = [Mode::Safe, Mode::Standard];
+
+/// Modes whose discount is decisive on a catalogue this size.
+///
+/// Safe is excluded, and its exclusion is the contract rather than an
+/// exception. Safe pairs the lowest score bar of the three with the mildest
+/// catalogue discount, so a well-shaped catalogue row can still clear the bar
+/// after being marked down. The stricter modes ask for less evidence before
+/// discounting and then discount harder, which on this fixture is the difference
+/// between a row being reported and not.
+const MODES_DISCOUNTING_BULK_AWAY: [Mode; 2] = [Mode::Standard, Mode::Apocalyptic];
 
 // The fixture's two catalogues, restated by formula rather than by three
 // hundred literals. Drift between generator and test surfaces immediately:
@@ -77,7 +88,7 @@ const DELIBERATE_WRITE: &str = "DELETE /api/rooms/{id}/members/{id}";
 const RARE_READ: &str = "GET /api/rooms/{id}/members";
 
 fn squeeze(mode: Mode) -> ReportModel {
-    burpsqueezer::squeeze(&fixture("catalogue.xml"), mode).expect("fixture must analyse")
+    burpsqueezer::squeeze(&fixture("catalogue.xml"), mode, true).expect("fixture must analyse")
 }
 
 fn splitmix64(seed: u64) -> u64 {
@@ -115,6 +126,15 @@ fn reported_values(model: &ReportModel) -> HashSet<&str> {
         .collect()
 }
 
+/// The score the report gave a handle, if it reported it at all.
+fn score_of(model: &ReportModel, handle: &str) -> Option<f64> {
+    model
+        .strong_values
+        .iter()
+        .find(|value| value.handle == handle)
+        .map(|value| value.score)
+}
+
 /// The report in reading order: Core Signal first, then Secondary Context.
 ///
 /// Rank is position in this sequence, which is what a reader actually meets —
@@ -137,18 +157,48 @@ fn listed<'a>(model: &'a ReportModel, endpoint: &str) -> (usize, &'a EndpointRow
 
 /// The headline symptom: three hundred rows of a shipped table, every one of
 /// them a well-formed UUID handed over by the server, filling Core Signal.
+///
+/// What the rule owes the reader is a price, not a purge, so this asks for the
+/// two things a discount can actually deliver. Where the mark-down is decisive
+/// the rows are gone. Everywhere, including the mode where they are not, a row
+/// that nobody ever sent back ranks below the one row of its own table that was
+/// — same endpoint, same body slot, same shape as its 299 siblings, differing
+/// only in use. That is what the rule keys on, and it is the property that
+/// survives being a multiplier.
 #[test]
-fn rows_of_a_bulk_catalogue_never_become_strong_values() {
+fn rows_of_a_bulk_catalogue_are_priced_below_the_row_a_client_sent_back() {
+    let chosen = handle_of(&catalogue_row(PALETTE_NAMESPACE, CHOSEN_PALETTE_ROW));
+    let bulk: Vec<String> = (0..PALETTE_ROWS)
+        .filter(|index| *index != CHOSEN_PALETTE_ROW)
+        .map(|index| handle_of(&catalogue_row(PALETTE_NAMESPACE, index)))
+        .collect();
+
     for mode in MODES {
         let model = squeeze(mode);
+        let chosen_score = score_of(&model, &chosen)
+            .unwrap_or_else(|| panic!("{mode:?}: the chosen palette row was suppressed, so \
+                there is nothing for the bulk rows to rank below"));
         let reported = reported_values(&model);
 
-        for index in (0..PALETTE_ROWS).filter(|index| *index != CHOSEN_PALETTE_ROW) {
-            let handle = handle_of(&catalogue_row(PALETTE_NAMESPACE, index));
-            assert!(
-                !reported.contains(handle.as_str()),
-                "{mode:?}: catalogue row {index} reached Strong Values as {handle}"
-            );
+        for handle in &bulk {
+            match score_of(&model, handle) {
+                None => {}
+                Some(score) => assert!(
+                    score < chosen_score,
+                    "{mode:?}: {handle} scored {score} against the chosen row's {chosen_score}, \
+                     so a row nobody sent back outranked the one that was"
+                ),
+            }
+        }
+
+        if MODES_DISCOUNTING_BULK_AWAY.contains(&mode) {
+            for (index, handle) in bulk.iter().enumerate() {
+                assert!(
+                    !reported.contains(handle.as_str()),
+                    "{mode:?}: catalogue row {index} reached Strong Values as {handle}, but \
+                     this mode's discount is decisive and should have left nothing to report"
+                );
+            }
         }
     }
 }
@@ -234,7 +284,7 @@ fn the_identifier_the_capture_is_about_survives_every_mode() {
 /// capture is asked which of its values repeat and which travel.
 #[test]
 fn repetition_alone_does_not_buy_rank() {
-    let model = squeeze(Mode::Peaceful);
+    let model = squeeze(Mode::Safe);
     let ranked: Vec<(usize, &ValueRow)> = model.strong_values.iter().enumerate().collect();
 
     let (weakest_rank, repeated) = ranked
@@ -291,47 +341,52 @@ fn a_rare_write_to_one_object_reaches_core_signal() {
     }
 }
 
-/// The floor under the promotion, and the one ordering that holds by arithmetic
-/// rather than by luck.
+/// The floor under the promotion, stated against every read the capture
+/// contains rather than against an idealised one.
 ///
-/// A read that yielded nothing scores on its fields and its status spread and
-/// nothing else, which caps it at `W_FIELDS + W_STATUS` = 0.25. A write seen
-/// once is rare by definition, so it takes the full lift on top of `W_METHOD`:
-/// 0.46 even in Safe, whose lift is the gentlest of the three. The gap is a
-/// property of the weights, so no capture can close it — which is exactly what
-/// makes this worth asserting where the ranking against well-evidenced reads is
-/// not.
+/// This used to compare the write against reads that yielded nothing, on the
+/// strength of Apocalyptic's ubiquity damping rejecting the session token. That
+/// premise was never true: a value the server issued and the client sends back
+/// is a credential, and every damping rule abstains from a credential by design
+/// — it is the one value in the capture worth having. So the token rides along on
+/// every route, no read is ever empty-handed, and the comparison quietly stopped
+/// testing anything.
 ///
-/// Only Apocalyptic leaves a read empty-handed here. The milder modes mine the
-/// session token, and every route in the capture carries it, so every route has
-/// something to show. Hence the tally: if a change ever gives every route a
-/// value in every mode, this test must fail rather than quietly stop testing.
+/// What is left is the claim the fixture can actually support, and it is the
+/// useful one: the capture's single deliberate write is never below a read. Not
+/// merely above the matched control, and not merely in Core Signal — above every
+/// GET in the report, by rank and by relevance, in all three modes. If a change
+/// ever lets a read pass a write this rare, this fails.
 #[test]
-fn a_deliberate_write_outranks_a_read_that_yielded_nothing() {
-    let mut compared = 0;
-
+fn a_deliberate_write_outranks_every_read_in_the_capture() {
     for mode in MODES {
         let model = squeeze(mode);
-        let (write_rank, _) = listed(&model, DELIBERATE_WRITE);
+        let (write_rank, write) = listed(&model, DELIBERATE_WRITE);
 
-        for (rank, row) in as_read(&model).enumerate() {
-            if !row.endpoint.starts_with("GET ") || !row.value_handles.is_empty() {
-                continue;
-            }
-            compared += 1;
+        let reads: Vec<(usize, &EndpointRow)> = as_read(&model)
+            .enumerate()
+            .filter(|(_, row)| row.endpoint.starts_with("GET "))
+            .collect();
+        assert!(
+            !reads.is_empty(),
+            "{mode:?}: the capture reported no reads, so there was nothing to compare"
+        );
+
+        for (rank, read) in reads {
+            assert!(
+                write.relevance > read.relevance,
+                "{mode:?}: {} scored {} against the capture's one deliberate write's {}",
+                read.endpoint,
+                read.relevance,
+                write.relevance
+            );
             assert!(
                 write_rank < rank,
-                "{mode:?}: {} yielded nothing and still outranked the capture's one \
-                 deliberate write",
-                row.endpoint
+                "{mode:?}: {} outranked the capture's one deliberate write",
+                read.endpoint
             );
         }
     }
-
-    assert!(
-        compared > 0,
-        "no mode left a read empty-handed, so this compared nothing"
-    );
 }
 
 /// The control that keeps the rule from being "anything seen once", and the

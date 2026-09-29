@@ -9,12 +9,12 @@ use burpsqueezer::model::report::ReportModel;
 use common::fixture;
 
 fn squeeze(name: &str, mode: Mode) -> ReportModel {
-    burpsqueezer::squeeze(&fixture(name), mode).expect("fixture must analyse")
+    burpsqueezer::squeeze(&fixture(name), mode, true).expect("fixture must analyse")
 }
 
 #[test]
 fn an_empty_file_is_rejected() {
-    let error = burpsqueezer::squeeze(&fixture("empty.xml"), Mode::Standard)
+    let error = burpsqueezer::squeeze(&fixture("empty.xml"), Mode::Standard, true)
         .expect_err("an empty file cannot be analysed");
     assert!(matches!(error, Error::EmptyInput(_)));
     assert_eq!(error.exit_code(), burpsqueezer::error::EXIT_BAD_INPUT);
@@ -22,7 +22,7 @@ fn an_empty_file_is_rejected() {
 
 #[test]
 fn malformed_xml_is_rejected_with_its_own_exit_code() {
-    let error = burpsqueezer::squeeze(&fixture("malformed.xml"), Mode::Standard)
+    let error = burpsqueezer::squeeze(&fixture("malformed.xml"), Mode::Standard, true)
         .expect_err("unclosed item must fail");
     assert!(matches!(error, Error::MalformedXml { .. }));
     assert_eq!(error.exit_code(), burpsqueezer::error::EXIT_MALFORMED_XML);
@@ -30,7 +30,7 @@ fn malformed_xml_is_rejected_with_its_own_exit_code() {
 
 #[test]
 fn a_missing_file_is_a_bad_input_not_a_panic() {
-    let error = burpsqueezer::squeeze(&fixture("does-not-exist.xml"), Mode::Standard)
+    let error = burpsqueezer::squeeze(&fixture("does-not-exist.xml"), Mode::Standard, true)
         .expect_err("missing file must fail");
     assert!(matches!(error, Error::ReadInput { .. }));
 }
@@ -187,7 +187,7 @@ fn the_session_token_is_mined_and_chained() {
 
 #[test]
 fn every_chain_handle_resolves_to_a_reported_value() {
-    let model = squeeze("dataflow.xml", Mode::Peaceful);
+    let model = squeeze("dataflow.xml", Mode::Safe);
     let handles: Vec<&str> = model
         .strong_values
         .iter()
@@ -217,10 +217,10 @@ fn a_tiny_dump_relaxes_thresholds_and_says_so() {
 }
 
 #[test]
-fn peaceful_mode_is_never_less_generous_than_standard() {
-    let peaceful = squeeze("noisy.xml", Mode::Peaceful);
+fn safe_mode_is_never_less_generous_than_standard() {
+    let safe = squeeze("noisy.xml", Mode::Safe);
     let standard = squeeze("noisy.xml", Mode::Standard);
-    assert!(peaceful.overview.kept_transactions >= standard.overview.kept_transactions);
+    assert!(safe.overview.kept_transactions >= standard.overview.kept_transactions);
 }
 
 #[test]
@@ -239,7 +239,7 @@ fn apocalyptic_mode_reports_no_more_than_standard() {
 
 #[test]
 fn overview_and_meta_agree_with_the_sections() {
-    for mode in [Mode::Peaceful, Mode::Standard, Mode::Apocalyptic] {
+    for mode in [Mode::Safe, Mode::Standard, Mode::Apocalyptic] {
         let model = squeeze("dataflow.xml", mode);
         assert_eq!(model.overview.strong_values, model.strong_values.len());
         assert_eq!(model.overview.chains, model.chains.len());
@@ -250,7 +250,7 @@ fn overview_and_meta_agree_with_the_sections() {
 
 #[test]
 fn sequences_are_anchored_to_reported_signal() {
-    let model = squeeze("dataflow.xml", Mode::Peaceful);
+    let model = squeeze("dataflow.xml", Mode::Safe);
     for sequence in &model.sequences {
         assert!(
             sequence.steps.len() >= 2,
@@ -268,7 +268,7 @@ fn state_indicators_stay_low_cardinality() {
     // The bound is read from the mode rather than written as a literal: rows are
     // passed through untruncated, so the promotion rule in stage 6 is the only
     // thing that limits cardinality, and that is what this asserts.
-    for mode in [Mode::Peaceful, Mode::Standard, Mode::Apocalyptic] {
+    for mode in [Mode::Safe, Mode::Standard, Mode::Apocalyptic] {
         let ceiling = Thresholds::for_mode(mode).variation_max_cardinality;
         let model = squeeze("dataflow.xml", mode);
         for indicator in &model.state_indicators {
@@ -287,3 +287,153 @@ fn state_indicators_stay_low_cardinality() {
         }
     }
 }
+
+/// The three structural rules against a capture built to defeat all of them.
+///
+/// `background_noise.xml` is a login, thirty heartbeat reads, a telemetry
+/// collector and three order reads. The heartbeat rotates a routing cookie every
+/// two calls, so the name is stable and the value never is; the collector is
+/// called sixteen times and returns nothing; both endpoints vary their field
+/// names, which is what makes folding a judgement rather than a guess.
+///
+/// None of the three rules is allowed to look at the names in this capture. A
+/// rule that fired here because it knew about `routing` or `/api/feed` would be
+/// worth nothing on the next one.
+#[test]
+fn a_rotating_routing_cookie_is_one_row_not_fifteen() {
+    let model = squeeze("background_noise.xml", Mode::Standard);
+
+    let collapsed: Vec<String> = model
+        .strong_values
+        .iter()
+        .map(|value| value.locations.join(" "))
+        .filter(|location| location.contains("cookie.*"))
+        .collect();
+    assert_eq!(
+        collapsed.len(),
+        1,
+        "fifteen replaced values are one piece of plumbing, saw {collapsed:?}"
+    );
+    assert!(
+        model.strong_values.iter().any(|v| v
+            .locations
+            .iter()
+            .any(|l| l.contains("collapsed 15 variants"))),
+        "the row must still say how many values it stands for, saw {:?}",
+        model
+            .strong_values
+            .iter()
+            .map(|v| &v.locations)
+            .collect::<Vec<_>>()
+    );
+
+    for value in &model.strong_values {
+        assert!(
+            value.locations.iter().all(|l| !l.contains("/api/feed (req")),
+            "a collapsed value owes no account of where its variants were, saw {:?}",
+            value.locations
+        );
+    }
+}
+
+#[test]
+fn a_collector_endpoint_is_damped_below_the_telemetry_it_carries() {
+    let model = squeeze("background_noise.xml", Mode::Standard);
+    let row = |endpoint: &str| {
+        model
+            .core_endpoints
+            .iter()
+            .chain(model.other_endpoints.iter())
+            .find(|e| e.endpoint == endpoint)
+            .unwrap_or_else(|| panic!("{endpoint} is missing from the report"))
+    };
+
+    let collector = row("GET /api/feed");
+    let telemetry = row("POST /api/collect/events");
+    assert_eq!(collector.hits, 30);
+    assert!(
+        collector.relevance < telemetry.relevance,
+        "thirty heartbeats carrying a cookie are worth less than the call that \
+         carries an identifier: {} vs {}",
+        collector.relevance,
+        telemetry.relevance
+    );
+    assert!(
+        !model.core_endpoints.iter().any(|e| e.endpoint == "GET /api/feed"),
+        "a damped endpoint stays out of Core Signal"
+    );
+}
+
+#[test]
+fn varied_telemetry_fields_fold_and_the_identifier_does_not() {
+    let model = squeeze("background_noise.xml", Mode::Standard);
+    let row = |endpoint: &str| {
+        model
+            .core_endpoints
+            .iter()
+            .chain(model.other_endpoints.iter())
+            .find(|e| e.endpoint == endpoint)
+            .unwrap_or_else(|| panic!("{endpoint} is missing from the report"))
+    };
+
+    let telemetry = row("POST /api/collect/events");
+    assert!(
+        telemetry.request_fields.iter().any(|f| f.contains("(8 keys)")),
+        "eight varying event properties are one line, saw {:?}",
+        telemetry.request_fields
+    );
+    assert!(
+        telemetry.request_fields.iter().any(|f| f == "event.device_id"),
+        "a field a Strong Value lives in is never folded away, saw {:?}",
+        telemetry.request_fields
+    );
+
+    // A query is already a summary of what varied, so folding one would say
+    // nothing and cost the reader the parameter names. The order is the
+    // report's own: most-seen first, then the order first seen.
+    let feed = row("GET /api/feed");
+    assert_eq!(
+        feed.query_params,
+        ["cursor", "page", "sort", "filter", "view", "from"],
+        "query parameters are listed, never folded"
+    );
+    assert!(
+        feed.request_fields.is_empty(),
+        "a GET with no body has no fields to report"
+    );
+}
+
+#[test]
+fn a_heartbeat_does_not_produce_a_sequence_of_itself() {
+    let model = squeeze("background_noise.xml", Mode::Standard);
+
+    // The fixture produces four windows of `/feed` calling itself, each with
+    // support in the twenties, all anchored to the routing cookie. They are the
+    // one thing the cookie summary already said, said at greater length, and
+    // the summary is the row that survives.
+    let collapsed_handle = model
+        .strong_values
+        .iter()
+        .find(|value| value.locations.iter().any(|l| l.contains("cookie.*")))
+        .map(|value| value.handle.clone())
+        .expect("the routing cookie is summarised as one row");
+
+    for sequence in &model.sequences {
+        let mut endpoints: Vec<&str> = sequence.steps.iter().map(|s| s.as_str()).collect();
+        endpoints.sort_unstable();
+        endpoints.dedup();
+        if endpoints.len() == 1 {
+            assert!(
+                !sequence.linked_handles.contains(&collapsed_handle),
+                "one endpoint calling itself, carried by plumbing, is not a \
+                 flow: {:?} on {collapsed_handle}",
+                sequence.steps
+            );
+        }
+    }
+    assert!(
+        !model.sequences.is_empty(),
+        "the fixture does contain a real window, and it must survive"
+    );
+}
+

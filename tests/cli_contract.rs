@@ -99,7 +99,7 @@ fn quiet_silences_progress_but_never_errors() {
 fn every_mode_is_accepted_and_the_report_names_the_one_used() {
     let scratch = Scratch::new("modes");
 
-    for mode in ["peaceful", "standard", "apocalyptic"] {
+    for mode in ["safe", "standard", "apocalyptic"] {
         let report = scratch.join(&format!("{mode}.md"));
         let output = solve("dataflow.xml", &report, &["--mode", mode]);
 
@@ -118,6 +118,68 @@ fn every_mode_is_accepted_and_the_report_names_the_one_used() {
         assert!(
             markdown.contains(&format!("| mode | {mode} |")),
             "mode {mode} is not recorded in Meta"
+        );
+    }
+}
+
+/// The report is the artefact that leaves the machine, so the default has to
+/// withhold values and `--secrets false` has to reach the rendered document —
+/// not merely be accepted by the parser.
+#[test]
+fn values_are_redacted_unless_secrets_is_turned_off() {
+    let scratch = Scratch::new("secrets");
+    let default = scratch.join("default.md");
+    let exposed = scratch.join("exposed.md");
+
+    let redacted_run = solve("dataflow.xml", &default, &[]);
+    assert_eq!(code(&redacted_run), EXIT_OK, "stderr: {}", stderr(&redacted_run));
+    let exposed_run = solve("dataflow.xml", &exposed, &["--secrets", "false"]);
+    assert_eq!(code(&exposed_run), EXIT_OK, "stderr: {}", stderr(&exposed_run));
+
+    let redacted = std::fs::read_to_string(&default).expect("report is readable");
+    let full = std::fs::read_to_string(&exposed).expect("report is readable");
+
+    // The default keeps its promise in the prose, and the flag has to be stated
+    // the other way round, or neither report can be trusted.
+    assert!(redacted.contains("full values are not printed in this report"));
+    assert!(full.contains("--secrets false"));
+
+    // Same capture, same rows, same handles: only the value column may differ.
+    let rows = |markdown: &str| {
+        let section = markdown
+            .split_once("### Strong Values\n\n")
+            .expect("the section is present")
+            .1
+            .lines()
+            .filter(|line| line.starts_with("| fp:"))
+            .map(str::to_string)
+            .collect::<Vec<_>>();
+        assert!(!section.is_empty(), "the fixture must mine values");
+        section
+    };
+    let (redacted_rows, exposed_rows) = (rows(&redacted), rows(&full));
+
+    assert_eq!(redacted_rows.len(), exposed_rows.len());
+    for (redacted_row, exposed_row) in redacted_rows.iter().zip(&exposed_rows) {
+        let handle_of = |row: &str| {
+            row.split('|')
+                .nth(1)
+                .expect("a table row has a handle cell")
+                .trim()
+                .to_string()
+        };
+        assert_eq!(
+            handle_of(redacted_row),
+            handle_of(exposed_row),
+            "the same handle must survive the flag"
+        );
+        assert!(
+            redacted_row.contains("[fp:"),
+            "the default report must truncate: {redacted_row}"
+        );
+        assert!(
+            !exposed_row.contains("[fp:"),
+            "--secrets false must write the value, not its mask: {exposed_row}"
         );
     }
 }

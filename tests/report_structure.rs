@@ -35,14 +35,14 @@ fn assert_layout(markdown: &str) {
 }
 
 fn render_fixture(name: &str, mode: Mode) -> String {
-    let model = burpsqueezer::squeeze(&fixture(name), mode).expect("fixture must analyse");
+    let model = burpsqueezer::squeeze(&fixture(name), mode, true).expect("fixture must analyse");
     render::render(&model)
 }
 
 #[test]
 fn layout_is_identical_for_every_fixture_and_mode() {
     for name in ["dataflow.xml", "tiny.xml", "noisy.xml"] {
-        for mode in [Mode::Peaceful, Mode::Standard, Mode::Apocalyptic] {
+        for mode in [Mode::Safe, Mode::Standard, Mode::Apocalyptic] {
             assert_layout(&render_fixture(name, mode));
         }
     }
@@ -86,7 +86,7 @@ fn meta_always_states_mode_version_and_masking() {
 #[test]
 fn no_full_secret_ever_reaches_the_report() {
     let secret = "c9f4a1b28e7d4f6ab3125e9d77aa0c31";
-    for mode in [Mode::Peaceful, Mode::Standard, Mode::Apocalyptic] {
+    for mode in [Mode::Safe, Mode::Standard, Mode::Apocalyptic] {
         let markdown = render_fixture("dataflow.xml", mode);
         assert!(
             !markdown.contains(secret),
@@ -111,11 +111,11 @@ fn a_stricter_mode_visibly_shrinks_core_signal() {
     // longer file. What the thresholds do guarantee is that the selectively mined
     // sections are a subset, and each row renders the same way in either mode.
     for heading in ["### Strong Values", "### Multi-Data-Flow Chains"] {
-        let peaceful = section(&render_fixture("noisy.xml", Mode::Peaceful), heading).len();
+        let safe = section(&render_fixture("noisy.xml", Mode::Safe), heading).len();
         let apocalyptic = section(&render_fixture("noisy.xml", Mode::Apocalyptic), heading).len();
         assert!(
-            apocalyptic <= peaceful,
-            "{heading}: apocalyptic ({apocalyptic}) should not exceed peaceful ({peaceful})"
+            apocalyptic <= safe,
+            "{heading}: apocalyptic ({apocalyptic}) should not exceed safe ({safe})"
         );
     }
 }
